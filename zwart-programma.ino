@@ -3,43 +3,50 @@
 Servo servoL; // voegt servo Links toe.
 Servo servoR; // voegt servo Rechts toe.
 Servo servoA; // voegt servo voor wegwerpen blikje toe.
-int i = 200; // deze waarde gebruiken we om te definiëren 
-int voorg;
-int rechtsg;
-int linksg;
-int achterg;
-int afstand;
-int tellerdraai = 0;
-int tellerafstanduit = 0;
-int tellerafstanddelay = 60;
 
+int i = 200; // deze waarde gebruiken we om te definiëren of een sensor licht ziet.
+
+int voorg; // voegt variabele voor getal toe.
+int rechtsg; // voegt variabele rechts getal toe.
+int linksg; // voegt variabele links getal toe.
+int achterg; // voegt variabele achter getal toe.
+int afstand; // voegt variabele afstand getal toe.
+int tellerdraai = 0; // voegt variabele teller toe voor links of rechts draaien.
+int tellerafstanduit = 0; // voegt variabele tellerafstanduit toe voor aan en uit zetten voor servoA.
+int tellerafstanddelay = 60; // voegt variabele tellerafstanddelay toe voor delay voordat hij de servo weer omlaag zet.
+
+// benodigheden voordat we in de loop gaan. Hier geven we alle pins aan.
 void setup(){
+  
   Serial.begin(9600);
-  servoL.attach(11);    //koppelt servoL aan pin 11
-  servoR.attach(10);    //koppelt servoR aan pin 10
-  servoA.attach(2);
-  pinMode(13, OUTPUT);
-  pinMode(A0, INPUT);
+  
+  servoL.attach(11); // koppelt servoL aan pin 11.
+  servoR.attach(10); // koppelt servoR aan pin 10.
+  servoA.attach(2); // koppelt servoA aan pin 2.
+
+  // Hier koppelen we pins aan input of output. 
+  pinMode(A0, INPUT); 
   pinMode(A1, INPUT);
   pinMode(A2, INPUT);
   pinMode(A3, INPUT);
   pinMode(A4, INPUT);
 
-  pinMode(6, OUTPUT);
-  pinMode(5, OUTPUT);
-  pinMode(4, OUTPUT);
   pinMode(3, OUTPUT);
+  pinMode(4, OUTPUT);
+  pinMode(5, OUTPUT);
+  pinMode(6, OUTPUT);
+  pinMode(13, OUTPUT); 
 
+  servoA.writeMicroseconds(1600); // zet servoA omhoog.
   
-  servoA.writeMicroseconds(1600);
 }
 
+// Rijprogramma loop.
 void loop(){
-  afstand=analogRead(A0);
-  voorg=analogRead(A4);
-  rechtsg=analogRead(A3);
-  linksg=analogRead(A2);
-  achterg=analogRead(A1);
+
+  // Kijk waar de lichtsensoren op zitten.
+  Lightcheckall();
+  
 //  Serial.print("afstand = ");
 //  Serial.println(afstand);
 //  Serial.print("voor = ");
@@ -50,196 +57,196 @@ void loop(){
 //  Serial.println(linksg);
 //  Serial.print("achter = ");
 //  Serial.println(achterg);
-  Serial.print("afstand is scuffed = ");
-  Serial.println(afstand);
-//if((afstand>250)&& (afstand<300) ){
+//  Serial.print("afstand is scuffed = ");
+//  Serial.println(afstand);
 
-if(tellerafstanduit == 45){
-    digitalWrite(13, LOW);                //laat stokje stoppen
-    servoA.writeMicroseconds(1600);       //positie omhoog
-    tellerafstanduit = 0;
+// na een delay van 4500ms zet servoA omhoog.
+if(tellerafstanddeuit == 45){
+  
+    digitalWrite(13, LOW); // laat stokje stoppen.
+    servoA.writeMicroseconds(1600); // positie omhoog.
+    tellerafstanduit = 0; // reset tellerafstanduit
+    
 }
 
+// als hij iets ziet en 6 seconden zijn al geweest nadat hij hierin kwam, zet servo omlaag.
 else if(afstand>280 && (tellerafstanddelay > 60)){
-//  stil();
-//  delay(100);
-//  Checkall();
-//  if(afstand>280){
-    Serial.print("afstand is scuffed in functie = ");
-    Serial.println(afstand);
-    stil();
-    servoA.writeMicroseconds(1600);       //positie omhoog
-    delay(1000);
-    digitalWrite(13, HIGH);               //laat stokje draaien
-    servoA.writeMicroseconds(700);        //positie omlaag
-    delay(2000);
-    tellerafstanddelay = 0;
-//  }
+//  Serial.print("afstand is scuffed in functie = ");
+//  Serial.println(afstand);
+  stil(); // sta stil om aan te geven dat je een obstakel ziet.
+  
+  servoA.writeMicroseconds(1600); // positie omhoog.
+  
+  delay(1000); // wacht 1 seconde.
+  
+  digitalWrite(13, HIGH); // laat stokje draaien.
+  servoA.writeMicroseconds(700); // positie omlaag.
+  
+  delay(2000); // wacht 2 seconden.
+  
+  tellerafstanddelay = 0; // reset tellerafstanddelay.
 }
 
-//if(afstand>250){
-//  stil();
-//  delay(100);
-//  Checkall();
-//  if(afstand>250){
-//    voor();
-//    delay(500);
-//    achter();
-//    delay(500);
-//    slinks();
-//    delay(500);
-//    srechts();
-//    delay(500);
-//  }
-//}
-
-//if((linksg>i) && (rechtsg>i) && (voorg>i) && (achterg>i)){
-//  voor();
-//}
-
+// als hij links, rechts en achter ziet.
 if((linksg>i) && (rechtsg>i) && (achterg>i)){
-  voor(); 
+  
+  voor(); // rechtdoor.
 }
 
+// als hij voor en achter ziet.
 else if((voorg>i) && (achterg>i)){
-  voor();
+  
+  voor(); // rechtdoor.
 }
 
+// als hij alleen links ziet.
 else if(linksg>i){
-  while(voorg<i){
+
+  // zolang hij voor niet ziet.
+  while(voorg<i){ 
+
+    // als het 250ms heeft geduurt voor het vinden van voor.
     if(tellerdraai>25){
-      slinks();
-      Checkall();
-      delay(10);
+      slinks(); // draai scherp links.
+      Checkall(); // check alles.
+      delay(10); // wacht 10ms.
     }
+
+    // als hij net een bocht heeft gevonden.
     else{
-      links();  
-      Checkall();
-      delay(10);
-      tellerdraai++;
+      links(); // draai links.
+      Checkall(); // check alles.
+      delay(10); // wacht 10ms.
+      
+      tellerdraai++; // optellen variabele tellerdraai.
     }
   }
-  tellerdraai = 0;
+  
+  tellerdraai = 0; // reset tellerdraai.
+  
 }
 
+// als hij alleen rechts ziet.
 else if(rechtsg>i){
+
+  // zolang hij niet voor ziet.
   while(voorg<i){
+
+    // als het 250ms heeft geduurt voor het vinden van voor.
     if(tellerdraai>25){
-      srechts();
-      Checkall();
-      delay(10);
+      srechts(); // draai scherp rechts.
+      Checkall(); // check alles.
+      delay(10); // wacht 10ms.
     }
+
+    // als hij net een bocht heeft gevonden.
     else{
-      rechts();  
-      Checkall();
-      delay(10);
-      tellerdraai++;
+      rechts();  // draai rechts.
+      Checkall(); // check alles.
+      delay(10); // wacht 10ms.
+      tellerdraai++; // optellen variabele tellerdraai.
     }
   }
-  tellerdraai = 0;
+  
+  tellerdraai = 0; // reset tellerdraai.
+
 }
 
+// als hij alleen voor ziet.
 else if(voorg>i){
-  voor();
+  
+  voor(); // rechtdoor.
+  
 }
 
+// als hij alleen achter ziet.
 else if(achterg>i){
+
+  // zolang hij achter ziet, zoek naar links of rechts.
   while(achterg>i){
-    achter();
-    delay(10);
-    Checkall();
+    achter(); // achteruit rijden.
+    Checkall(); // check alles.
+    delay(10); // wacht 10ms.
+
+    // als hij links eerst ziet.
     if(linksg>i){
-      slinks();
-      delay(750);
-      break;
+      slinks(); // scherp naar links.
+      delay(750); // wacht 750ms.
+      
+      break; // ga uit de loop, want hij heeft links gevonden.
     }
+
+    // als hij rechts eerst ziet.
     else if(rechtsg>i){
-      srechts();
-      delay(750);
-      break;
+      srechts(); // scherp naar rechts.
+      delay(750); // wacht 750ms.
+      
+      break; // ga uit de loop, want hij heeft rechts gevonden.
     }
   }
 }
 
-//else if(achterg>i){
-//  while(achterg>i){
-//    achter();
-//    delay(10);
-//    Checkall();
-//    if(linksg>i){
-//      slinks();
-//      delay(750);
-//      voor();
-//      delay(175);
-//      while(voorg<i){
-//        slinks();
-//        delay(10);
-//        Checkall();
-//      }
-//      break;
-//    }
-//    else if(rechtsg>i){
-//      srechts();
-//      delay(750);
-//      voor();
-//      delay(175);
-//      while(voorg<i){
-//        srechts();
-//        delay(10);
-//        Checkall();
-//      }
-//      break;
-//    }
-//  }
-//  
-//}
-
+// als hij geen van de condities boven heeft voldaan.
 else{
-  voor();
+  
+  voor(); // rechtdoor.
+
 }
 
-tellerafstanduit++;
-tellerafstanddelay++;
-LEDcheck();
-delay(100);
+tellerafstanduit++; // optellen tellerafstanduit.
+tellerafstanddelay++; // optellen tellerafstanddelay.
+
+LEDcheck(); // controleer LEDjes.
+
+delay(100); // wacht 100ms.
+
 }
 
+// functie stilstaan.
 int stil(){
   servoL.writeMicroseconds(1500);
   servoR.writeMicroseconds(1500);
 }
 
+// functie vooruit rijden.
 int voor(){
   servoL.writeMicroseconds(1570);
   servoR.writeMicroseconds(1423);
 }
 
+// functie scherp rechts afslaan.
 int srechts(){
   servoL.writeMicroseconds(1550);
   servoR.writeMicroseconds(1550);
 }
 
+// functie scherp links afslaan.
 int slinks(){
   servoL.writeMicroseconds(1450);
   servoR.writeMicroseconds(1450);
 }
 
+// functie achteruitrijden.
 int achter(){
   servoL.writeMicroseconds(1430);
   servoR.writeMicroseconds(1577);
 }
 
+// functie rechts afslaan.
 int rechts(){
   servoL.writeMicroseconds(1550);
   servoR.writeMicroseconds(1500);
 }
 
+// functie links afslaan.
 int links(){
   servoL.writeMicroseconds(1500);
   servoR.writeMicroseconds(1450);
 }
 
 
+// functies voor het checken van de LEDjes.
+// functie LEDlinks.
 int LEDlinks(){
   if(linksg>i){
     digitalWrite(6, HIGH);
@@ -249,6 +256,7 @@ int LEDlinks(){
   }
 }
 
+// functie LEDvoor.
 int LEDvoor(){
   if(voorg>i){
     digitalWrite(5, HIGH);
@@ -258,6 +266,7 @@ int LEDvoor(){
   }
 }
 
+// functie LEDachter.
 int LEDachter(){
   if(achterg>i){
     digitalWrite(4, HIGH);
@@ -267,6 +276,7 @@ int LEDachter(){
   }
 }
 
+// functie LEDrechts.
 int LEDrechts(){
   if(rechtsg>i){
     digitalWrite(3, HIGH);
@@ -276,6 +286,7 @@ int LEDrechts(){
   }
 }
 
+// functie LEDcheck, om alle LEDjes te checken.
 int LEDcheck(){
   LEDlinks();
   LEDvoor();
@@ -283,13 +294,15 @@ int LEDcheck(){
   LEDrechts();
 }
 
+// functie Lightcheckall, om alle lichtsensoren te checken.
 int Lightcheckall(){
-  voorg=analogRead(A4);
-  rechtsg=analogRead(A3);
-  linksg=analogRead(A2);
   achterg=analogRead(A1);
+  linksg=analogRead(A2);
+  rechtsg=analogRead(A3);
+  voorg=analogRead(A4);
 }
 
+// functie Checkall, om alle sensoren te checken. Vooral om dubbele code te vermijden.
 int Checkall(){
   Lightcheckall();
   LEDcheck();
