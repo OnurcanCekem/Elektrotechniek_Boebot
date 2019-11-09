@@ -4,6 +4,7 @@ Servo servoL; // voegt servo Links toe.
 Servo servoR; // voegt servo Rechts toe.
 Servo servoA; // voegt servo voor wegwerpen blikje toe.
 
+// hier worden globale variabelen aangemaakt.
 int i = 200; // deze waarde gebruiken we om te definiëren of een sensor licht ziet.
 
 int voorg; // voegt variabele voor getal toe.
@@ -15,6 +16,27 @@ int tellerdraai = 0; // voegt variabele teller toe voor links of rechts draaien.
 int tellerafstanduit = 0; // voegt variabele tellerafstanduit toe voor aan en uit zetten voor servoA.
 int tellerafstanddelay = 60; // voegt variabele tellerafstanddelay toe voor delay voordat hij de servo weer omlaag zet.
 
+// prototypen
+// functies rijden
+int stil(); // stilstaan.
+int voor(); // vooruit rijden.
+int achter(); // achteruitrijden.
+int rechts(); // rechts afslaan.
+int links(); // links afslaan.
+int srechts(); // scherp rechts afslaan.
+int slinks(); // scherp links afslaan.
+
+// functies LEDjes checken
+int LEDlinks(); // check linker LED.
+int LEDvoor(); // check voor LED.
+int LEDachter(); // check achter LED.
+int LEDrechts(); // check rechter LED.
+int LEDcheck(); // check alle LEDjes.
+
+int Lightcheckall(); // check alle lichtsensoren.
+int Checkall(); // check alles: sensoren en LEDjes.
+
+
 // benodigheden voordat we in de loop gaan. Hier geven we alle pins aan.
 void setup(){
   
@@ -24,7 +46,7 @@ void setup(){
   servoR.attach(10); // koppelt servoR aan pin 10.
   servoA.attach(2); // koppelt servoA aan pin 2.
 
-  // Hier koppelen we pins aan input of output. 
+  // hier koppelen we pins aan input of output. 
   pinMode(A0, INPUT); 
   pinMode(A1, INPUT);
   pinMode(A2, INPUT);
@@ -41,11 +63,11 @@ void setup(){
   
 }
 
-// Rijprogramma loop.
+// rijprogramma loop.
 void loop(){
 
-  // Kijk waar de lichtsensoren op zitten.
-  Lightcheckall();
+  // kijk waar de sensoren op zitten.
+  Checkall();
   
 //  Serial.print("afstand = ");
 //  Serial.println(afstand);
@@ -61,7 +83,7 @@ void loop(){
 //  Serial.println(afstand);
 
 // na een delay van 4500ms zet servoA omhoog.
-if(tellerafstanddeuit == 45){
+if(tellerafstanduit == 45){
   
     digitalWrite(13, LOW); // laat stokje stoppen.
     servoA.writeMicroseconds(1600); // positie omhoog.
@@ -196,8 +218,6 @@ else{
 tellerafstanduit++; // optellen tellerafstanduit.
 tellerafstanddelay++; // optellen tellerafstanddelay.
 
-LEDcheck(); // controleer LEDjes.
-
 delay(100); // wacht 100ms.
 
 }
@@ -212,18 +232,6 @@ int stil(){
 int voor(){
   servoL.writeMicroseconds(1570);
   servoR.writeMicroseconds(1423);
-}
-
-// functie scherp rechts afslaan.
-int srechts(){
-  servoL.writeMicroseconds(1550);
-  servoR.writeMicroseconds(1550);
-}
-
-// functie scherp links afslaan.
-int slinks(){
-  servoL.writeMicroseconds(1450);
-  servoR.writeMicroseconds(1450);
 }
 
 // functie achteruitrijden.
@@ -244,6 +252,17 @@ int links(){
   servoR.writeMicroseconds(1450);
 }
 
+// functie scherp rechts afslaan.
+int srechts(){
+  servoL.writeMicroseconds(1550);
+  servoR.writeMicroseconds(1550);
+}
+
+// functie scherp links afslaan.
+int slinks(){
+  servoL.writeMicroseconds(1450);
+  servoR.writeMicroseconds(1450);
+}
 
 // functies voor het checken van de LEDjes.
 // functie LEDlinks.
